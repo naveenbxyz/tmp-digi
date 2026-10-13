@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Post Trade Services: AI Engineering strategy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Carlito:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caladea:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --page:#e6eaef; --paper:#ffffff; --ink:#17212b; --ink2:#3e4a58; --muted:#687484;
+  --line:#dbe1e8; --line2:#c6ced8;
+  --head:#1b2a41;
+  --teal:#0f6f68; --teal-ink:#0b5852; --teal-soft:#e3f1ee; --teal-mid:#c3e2dc;
+  --indigo:#3c3f8c; --indigo-soft:#ecebf8; --indigo-mid:#d6d5f0;
+  --slate:#4a5868; --slate-soft:#eef1f5; --slate-mid:#d7dee6;
+  --amber:#a9660f; --amber-soft:#fbf0dc; --amber-line:#ecc98c;
+  --on-strong:#ffffff;
+  --sans: Calibri, Carlito, "Segoe UI", system-ui, -apple-system, sans-serif;
+  --serif: Cambria, Caladea, Georgia, "Times New Roman", serif;
+  box-sizing:border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --page:#0c1015; --paper:#141a21; --ink:#e6ebf1; --ink2:#bac4cf; --muted:#8b97a5;
+    --line:#27313c; --line2:#36414e; --head:#e9eef4;
+    --teal:#56c0b2; --teal-ink:#86d6cb; --teal-soft:#112a28; --teal-mid:#1c4541;
+    --indigo:#a8abf0; --indigo-soft:#1c1e37; --indigo-mid:#2c2f55;
+    --slate:#a4b1c0; --slate-soft:#1a2029; --slate-mid:#28313c;
+    --amber:#e5ac56; --amber-soft:#2c2312; --amber-line:#5c4620;
+    --on-strong:#0b1514;
+  }
+}
+:root[data-theme="dark"]{
+  --page:#0c1015; --paper:#141a21; --ink:#e6ebf1; --ink2:#bac4cf; --muted:#8b97a5;
+  --line:#27313c; --line2:#36414e; --head:#e9eef4;
+  --teal:#56c0b2; --teal-ink:#86d6cb; --teal-soft:#112a28; --teal-mid:#1c4541;
+  --indigo:#a8abf0; --indigo-soft:#1c1e37; --indigo-mid:#2c2f55;
+  --slate:#a4b1c0; --slate-soft:#1a2029; --slate-mid:#28313c;
+  --amber:#e5ac56; --amber-soft:#2c2312; --amber-line:#5c4620;
+  --on-strong:#0b1514;
+}
+*,*::before,*::after{ box-sizing:border-box; }
+html{ height:100%; scroll-padding-top: env(safe-area-inset-top, 0px); }
+body{ height:100%; margin:0; background:var(--page); color:var(--ink); font-family:var(--sans); font-size:12.5px; line-height:1.3; -webkit-font-smoothing:antialiased; }
+h1,h2,h3,p,dl,dd,ul,ol{ margin:0; padding:0; }
+ul,ol{ list-style:none; }
+
+/* stage: fixed 16:9 canvas scaled to fit */
+.stage{ height:100%; display:flex; align-items:center; justify-content:center; overflow:hidden; }
+.frame{ position:relative; flex:none; }
+.slide{
+  position:absolute; top:0; left:0; width:1600px; height:900px; transform-origin:0 0;
+  background:var(--paper); border-radius:4px;
+  box-shadow:0 1px 2px rgba(20,30,45,.08), 0 12px 32px rgba(20,30,45,.10);
+  padding:20px 26px 12px;
+  display:grid; grid-template-rows:auto 1fr auto auto; gap:12px;
+}
+
+/* header */
+.hd{ display:grid; grid-template-columns:1fr 420px; gap:28px; align-items:end; padding-bottom:12px; border-bottom:2px solid var(--head); }
+.kicker{ font-size:13px; color:var(--teal-ink); font-weight:700; margin-bottom:5px; }
+h1{ font-family:var(--serif); font-weight:700; font-size:30px; line-height:1.12; color:var(--head); letter-spacing:-.2px; max-width:1040px; text-wrap:balance; }
+.nb{ white-space:nowrap; }
+.principles{ display:flex; flex-direction:column; gap:4px; border-left:3px solid var(--teal); padding-left:12px; }
+.principles li{ font-size:13px; color:var(--ink2); line-height:1.25; }
+.principles b{ color:var(--ink); }
+
+/* section titles */
+.ttl{ display:flex; align-items:baseline; gap:10px; margin-bottom:6px; }
+.ttl h2{ font-family:var(--serif); font-size:17px; color:var(--head); font-weight:700; white-space:nowrap; }
+.ttl span{ font-size:12px; color:var(--muted); }
+
+/* main body */
+.main{ display:grid; grid-template-columns:262px 1fr; gap:18px; min-height:0; }
+.core{ display:grid; grid-template-rows:1fr auto; gap:12px; min-height:0; }
+.main > *, .core > *, .arch-grid > *, .strip > *{ min-width:0; }
+
+/* evidence rail */
+.rail{ display:flex; flex-direction:column; padding-right:16px; border-right:1px solid var(--line); min-height:0; }
+.ev{ padding:4px 0 5px 10px; border-left:2px solid var(--line2); margin-bottom:5px; }
+.ev .src{ font-weight:700; font-size:12.5px; color:var(--ink); margin-bottom:2px; }
+.ev p{ color:var(--ink2); font-size:12px; line-height:1.28; }
+.ev .so{ margin-top:4px; color:var(--teal-ink); font-weight:700; font-size:12px; }
+.ev .so::before{ content:"\2192\00a0"; }
+.mine{ margin-top:auto; background:var(--amber-soft); border:1px solid var(--amber-line); border-radius:4px; padding:9px 11px 10px; }
+.mine h3{ font-family:var(--serif); font-size:17px; color:var(--amber); line-height:1.1; margin-bottom:4px; }
+.mine p{ font-size:12px; color:var(--ink2); line-height:1.3; }
+.mine .so{ margin-top:5px; color:var(--ink); font-weight:700; }
+.mine .so::before{ content:"\2192\00a0"; color:var(--amber); }
+
+/* architecture */
+.arch{ min-height:0; display:flex; flex-direction:column; }
+.arch-grid{ flex:1; display:grid; grid-template-columns:208px 1fr 268px; gap:14px; min-height:0; }
+.spine{ display:flex; flex-direction:column; gap:6px; padding:0 2px; }
+.spine h3{ font-family:var(--serif); font-size:14.5px; color:var(--head); margin-bottom:1px; }
+.spine .sub{ font-size:11.5px; color:var(--muted); margin-top:-6px; margin-bottom:2px; }
+.spine-l{ border-right:1px dashed var(--line2); padding-right:12px; }
+.spine-r{ border-left:1px dashed var(--line2); padding-left:12px; }
+.si b{ display:block; font-size:12.5px; color:var(--ink); }
+.si span{ display:block; font-size:11.5px; color:var(--ink2); line-height:1.25; }
+.si-foot{ margin-top:auto; font-size:11.5px; color:var(--slate); font-style:italic; }
+.loop{ background:var(--amber-soft); border-left:3px solid var(--amber); padding:5px 8px; border-radius:0 3px 3px 0; }
+
+.stack{ display:flex; flex-direction:column; min-height:0; }
+.layer{ border-radius:5px; padding:6px 9px 7px; display:grid; grid-template-columns:168px 1fr; gap:10px; align-items:stretch; }
+.lh{ display:flex; flex-direction:column; justify-content:center; }
+.lh .role{ font-size:11px; font-weight:700; margin-bottom:1px; }
+.lh b{ font-family:var(--serif); font-size:14px; line-height:1.1; }
+.lh .ls{ font-size:11px; color:var(--ink2); line-height:1.2; margin-top:2px; }
+.tiles{ display:grid; gap:5px; }
+.t5{ grid-template-columns:repeat(5,1fr); }
+.t4{ grid-template-columns:repeat(4,1fr); }
+.tile{ background:var(--paper); border-radius:3px; padding:5px 7px; font-size:12px; font-weight:700; color:var(--ink); line-height:1.15; display:flex; flex-direction:column; justify-content:center; }
+.tile small{ display:block; font-size:10.8px; font-weight:400; color:var(--ink2); margin-top:2px; line-height:1.15; }
+.l-hive{ background:var(--slate-soft); border:1px solid var(--slate-mid); }
+.l-hive .role{ color:var(--slate); }
+.l-hive .tile{ border:1px solid var(--slate-mid); }
+.l-found{ background:var(--teal-soft); border:1.5px solid var(--teal); padding-top:8px; padding-bottom:9px; }
+.l-found .role{ color:var(--teal-ink); }
+.l-found .lh b{ color:var(--teal-ink); font-size:15px; }
+.l-found .tile{ border:1px solid var(--teal-mid); border-top:3px solid var(--teal); }
+.l-central{ background:var(--indigo-soft); border:1px solid var(--indigo-mid); }
+.l-central .role{ color:var(--indigo); }
+.l-central .tile{ border:1px solid var(--indigo-mid); font-weight:400; }
+.tile-data small{ color:var(--teal-ink); }
+.conn{ text-align:center; font-size:10.5px; color:var(--muted); padding:1px 0; line-height:1.2; }
+.conn::before{ content:"\25B2\00a0"; font-size:8px; vertical-align:1px; color:var(--line2); }
+
+/* use-case landscape: four vertical tracks */
+.tracks{ display:grid; grid-template-columns:92px 1.2fr 1fr 1fr 0.9fr; column-gap:10px; }
+.corner{ display:flex; align-items:flex-end; padding:0 6px 7px 0; }
+.corner h2{ font-family:var(--serif); font-size:17px; color:var(--head); font-weight:700; line-height:1.08; }
+.tc{ min-width:0; padding:5px 10px; background:var(--paper); border-left:1px solid var(--line); border-right:1px solid var(--line); }
+.tc.th{ background:var(--slate-soft); border:1px solid var(--slate-mid); border-top:3px solid var(--head); border-radius:3px 3px 0 0; padding:5px 10px 6px; }
+.tc.th b{ display:block; font-family:var(--serif); font-size:14px; color:var(--head); line-height:1.12; }
+.tc.th span{ display:block; font-size:11px; color:var(--ink2); line-height:1.2; margin-top:2px; }
+.tc.th em{ display:block; font-style:normal; font-size:10.8px; font-weight:700; color:var(--teal-ink); margin-top:3px; }
+.tc.rb, .tc.rd{ border-top:1px solid var(--line); }
+.tc.end{ border-bottom:1px solid var(--line); border-radius:0 0 3px 3px; }
+.tc.none{ grid-row:span 2; display:flex; align-items:center; font-size:11.5px; font-style:italic; color:var(--muted); line-height:1.3; }
+.tc li{ font-size:12px; line-height:1.25; padding:1px 0; color:var(--ink); }
+.tc li b{ font-weight:700; }
+.tc li small{ font-size:10.8px; color:var(--muted); margin-left:4px; }
+.tc li.ct b::before{ content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--amber); margin-right:6px; vertical-align:1px; }
+.tc.rb li b{ color:var(--teal-ink); }
+.tc.rd li b{ font-weight:400; }
+.rl{ padding:5px 8px 5px 0; font-size:12px; font-weight:700; line-height:1.2; }
+.rl-live{ color:var(--slate); }
+.rl-bld{ color:var(--teal-ink); border-top:1px solid transparent; }
+.rl-dir{ color:var(--muted); border-top:1px solid transparent; }
+.rl small{ display:block; font-weight:400; font-size:10.5px; color:var(--muted); margin-top:5px; line-height:1.25; }
+.rl small::before{ content:""; display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--amber); margin-right:4px; vertical-align:1px; }
+
+/* bottom strip */
+.strip{ display:grid; grid-template-columns:1fr 430px; gap:26px; padding-top:10px; border-top:1px solid var(--line); }
+.path{ display:grid; grid-template-columns:186px 18px 186px 26px 1fr; align-items:stretch; }
+.st{ background:var(--slate-soft); border:1px solid var(--slate-mid); border-radius:4px; padding:6px 9px; display:flex; flex-direction:column; justify-content:center; }
+.st b{ font-size:13px; color:var(--ink); }
+.st span{ font-size:11.3px; color:var(--ink2); line-height:1.22; margin-top:1px; }
+.m{ display:block; font-style:normal; font-size:11.5px; font-weight:700; color:var(--teal-ink); margin-top:4px; }
+.m em{ font-style:normal; font-weight:400; color:var(--muted); margin-right:3px; }
+.ar{ display:flex; align-items:center; justify-content:center; color:var(--teal); font-size:15px; }
+.fan{ position:relative; margin:14px 0 14px 12px; border:1.5px solid var(--teal); border-right:none; border-radius:3px 0 0 3px; }
+.fan::before{ content:""; position:absolute; left:-13px; top:50%; width:12px; border-top:1.5px solid var(--teal); }
+.fan::after{ content:""; position:absolute; left:0; right:0; top:50%; border-top:1.5px solid var(--teal); }
+.br{ display:flex; flex-direction:column; gap:3px; }
+.b{ display:grid; grid-template-columns:116px 1fr 190px; align-items:center; gap:10px; padding:3px 9px; border-radius:3px; background:var(--slate-soft); border:1px solid var(--slate-mid); }
+.b b{ font-size:12.5px; color:var(--ink); }
+.b span{ font-size:11.3px; color:var(--ink2); line-height:1.2; }
+.b .m{ margin-top:0; }
+.b.star{ background:var(--teal-soft); border:1.5px solid var(--teal); }
+.b.star .m{ font-size:12.5px; }
+.pm{ margin-top:6px; font-size:11.5px; color:var(--ink2); }
+.pm b{ color:var(--ink); }
+.owners{ display:grid; grid-template-columns:1fr 1fr; gap:6px 16px; }
+.owners dt{ font-weight:700; font-size:12.5px; color:var(--ink); }
+.owners dd{ font-size:11.5px; color:var(--ink2); line-height:1.22; }
+.owners .o-h dt{ color:var(--slate); }
+.owners .o-e dt{ color:var(--teal-ink); }
+.owners .o-a dt{ color:var(--amber); }
+.owners .o-c dt{ color:var(--indigo); }
+
+/* footer */
+.ft{ display:flex; justify-content:space-between; gap:20px; font-size:10.5px; color:var(--muted); }
+
+/* narrow screens: drop the canvas, let it flow */
+body.flow{ height:auto; }
+body.flow .stage{ display:block; height:auto; overflow:visible; padding:10px; }
+body.flow .frame{ width:auto !important; height:auto !important; }
+body.flow .slide{ position:static; width:auto; height:auto; transform:none !important; display:flex; flex-direction:column; gap:16px; padding:16px; }
+body.flow .hd{ grid-template-columns:1fr; gap:12px; }
+body.flow h1{ font-size:22px; }
+body.flow .main{ grid-template-columns:1fr; }
+body.flow .rail{ border-right:none; padding-right:0; }
+body.flow .mine{ margin-top:6px; }
+body.flow .arch-grid{ grid-template-columns:1fr; }
+body.flow .spine-l, body.flow .spine-r{ border:none; padding:0; }
+body.flow .layer{ grid-template-columns:1fr; }
+body.flow .t5, body.flow .t4{ grid-template-columns:repeat(2,1fr); }
+body.flow .ucs{ overflow-x:auto; }
+body.flow .tracks{ min-width:860px; }
+body.flow .strip{ grid-template-columns:1fr; }
+body.flow .path{ grid-template-columns:1fr; gap:6px; }
+body.flow .ar, body.flow .fan{ display:none; }
+body.flow .b{ grid-template-columns:1fr; gap:2px; }
+body.flow .ft{ flex-direction:column; gap:4px; }
+</style>
+</head>
+<body>
+<div class="stage">
+ <div class="frame">
+  <div class="slide" role="document" aria-label="Post Trade Services AI Engineering strategy">
+
+   <header class="hd">
+    <div>
+     <div class="kicker">Post Trade Services: AI Engineering strategy</div>
+     <h1>From manual evidence-handling and reactive exception management to <span class="nb">AI-augmented</span>, continuously learning post-trade operations</h1>
+    </div>
+    <ul class="principles">
+     <li><b>Capability hives own</b> governed AI layers close to their domain applications</li>
+     <li><b>Shared foundations</b> make each new use case cheaper and safer to deliver</li>
+     <li><b>Value is proven</b> before anything scales</li>
+    </ul>
+   </header>
+
+   <div class="main">
+
+    <aside class="rail" aria-label="Why now">
+     <div class="ttl"><h2>Why now</h2><span>what the evidence tells us to do</span></div>
+
+     <article class="ev">
+      <div class="src">McKinsey, gen AI at scale</div>
+      <p>Gen AI scales on platforms of validated, reusable services, not one-off builds.</p>
+      <p class="so">Build domain foundations once; every hive reuses them</p>
+     </article>
+
+     <article class="ev">
+      <div class="src">DORA, AI-assisted development</div>
+      <p>AI amplifies what is already there, good or bad; healthy data and internal platforms come first.</p>
+      <p class="so">Fix squad coherence and data foundations before scaling adoption</p>
+     </article>
+
+     <article class="ev">
+      <div class="src">Industry, accelerated settlement</div>
+      <p>EU, UK and Swiss markets move to T+1; post-trade heads toward always-on and automated.</p>
+      <p class="so">Detect and resolve exceptions in near-real time</p>
+     </article>
+
+     <article class="ev">
+      <div class="src">MAS AI Risk Management Guidelines</div>
+      <p>AI inventory, risk materiality and lifecycle controls are now expected, agents included.</p>
+      <p class="so">Design control and evidence in, not on</p>
+     </article>
+
+     <div class="mine">
+      <h3>Our own evidence</h3>
+      <p>AI is live in post-trade today, but where Markets can't tune schemas, prompts or evals, accuracy issues persist and corrections don't flow back.</p>
+      <p class="so">Bring every workflow into a Markets-owned loop</p>
+     </div>
+    </aside>
+
+    <div class="core">
+
+     <section class="arch" aria-label="Strategic architecture">
+      <div class="ttl"><h2>Strategic architecture</h2><span>Centralise what is common, federate what is domain</span></div>
+      <div class="arch-grid">
+
+       <div class="spine spine-l">
+        <h3>AI-native delivery</h3>
+                <div class="si"><b>Spec, code, verify</b><span>AI-assisted SDLC where every change is checked against evals and tests</span></div>
+        <div class="si"><b>Evidence to requirement</b><span>Ops exceptions, queries and breaks shape the product backlog</span></div>
+        <div class="si"><b>AI-assisted data engineering</b><span>Lineage, classification, data-quality rules and data-product contracts</span></div>
+        <p class="si-foot">DORA delivery metrics baselined for every squad</p>
+       </div>
+
+       <div class="stack">
+        <div class="layer l-hive">
+         <div class="lh"><span class="role">Retain</span><b>Capability hives</b><span class="ls">Own outcomes, domain schemas and human review</span></div>
+         <div class="tiles t5">
+          <div class="tile">Settlements</div>
+          <div class="tile">Client Confirmations</div>
+          <div class="tile">Clearing &amp; Margining</div>
+          <div class="tile">Reporting, MI &amp; Analytics</div>
+          <div class="tile tile-data">Data<small>also supplies the data products below</small></div>
+         </div>
+        </div>
+        <div class="conn">every hive builds on the same foundations</div>
+        <div class="layer l-found">
+         <div class="lh"><span class="role">Build and contribute</span><b>Shared AI foundations</b><span class="ls">Built once by horizontal engineering, reused by every hive</span></div>
+         <div class="tiles t5">
+          <div class="tile">SIFT<small>Deterministic flows with an LLM step and domain controls</small></div>
+          <div class="tile">Agent orchestration<small>Agents, skills and tools working toward an outcome</small></div>
+          <div class="tile">AI-ready data products<small>Lineage, contracts, semantic layer for queries</small></div>
+          <div class="tile">Eval harness<small>Golden sets and regression gates</small></div>
+          <div class="tile">Observability<small>Traces, prompts, cost and drift</small></div>
+         </div>
+        </div>
+        <div class="conn">foundations consume enterprise inference and guardrails</div>
+        <div class="layer l-central">
+         <div class="lh"><span class="role">Consume</span><b>Central AI Factory</b><span class="ls">Enterprise inference and guardrails</span></div>
+         <div class="tiles t4">
+          <div class="tile">LLM endpoints</div>
+          <div class="tile">AI gateway</div>
+          <div class="tile">Guardrails and security</div>
+          <div class="tile">Document IDP</div>
+         </div>
+        </div>
+       </div>
+
+       <div class="spine spine-r">
+        <h3>Control and learning loop</h3>
+                <div class="si"><b>Markets owns the loop</b><span>Schemas, prompts, evals and datasets stay with the domain, whoever hosts the model</span></div>
+        <div class="si"><b>Risk-tiered intake</b><span>Program Design Authority tiers by impact, complexity, reliance</span></div>
+        <div class="si"><b>One way of measuring</b><span>Same quality, cost and drift measures in every hive</span></div>
+        <div class="si loop"><b>Human corrections become eval cases</b><span>Accuracy is a property of the feedback loop, not the model</span></div>
+       </div>
+
+      </div>
+     </section>
+
+     <section class="ucs" aria-label="Use-case landscape">
+      <div class="tracks">
+       <div class="corner"><h2>Use-case landscape</h2></div>
+       <div class="tc th"><b>Evidence and instruction processing</b><span>Deterministic flow, LLM step, domain controls</span><em>Runs on SIFT</em></div>
+       <div class="tc th"><b>Self-service data and insight</b><span>Natural-language questions over post-trade data</span><em>Runs on AI-ready data products</em></div>
+       <div class="tc th"><b>Agentic exception handling</b><span>Agents and tools orchestrated toward an outcome</span><em>Runs on agent orchestration</em></div>
+       <div class="tc th"><b>Predictive and detective controls</b><span>Anticipate exceptions before they happen</span><em>Runs on data products and evals</em></div>
+
+       <div class="rl rl-live">Live today<small>on the central tool</small></div>
+       <div class="tc"><ul>
+        <li class="ct"><b>FX Netting</b><small>Settlements</small></li>
+        <li class="ct"><b>Proof of Underlying</b><small>Client Confirmations</small></li>
+        <li class="ct"><b>FX Confirmation Exchange</b><small>Client Confirmations</small></li>
+        <li class="ct"><b>Margin and Collateral Automation</b><small>Clearing &amp; Margining</small></li>
+       </ul></div>
+       <div class="tc"><ul>
+        <li><b>Self-service data reporting</b><small>NL to SQL, thousands of ops users</small></li>
+        <li><b>Regulatory insight assistants</b><small>regulatory platforms</small></li>
+       </ul></div>
+       <div class="tc none">Not yet live: the first requirement has come from the business</div>
+       <div class="tc none">Grows from the review and exception history the other three accumulate</div>
+
+       <div class="rl rl-bld">Building now</div>
+       <div class="tc rb"><ul>
+        <li><b>Cashflow Affirmation</b><small>Settlements</small></li>
+        <li><b>Trade Validation</b><small>Trade Capture &amp; Lifecycle</small></li>
+       </ul></div>
+       <div class="tc rb"><ul>
+        <li><b>More Markets data sources</b><small>widening what users can ask</small></li>
+       </ul></div>
+
+       <div class="rl rl-dir">Direction</div>
+       <div class="tc rd end"><ul>
+        <li><b>Central-tool workflows move onto SIFT</b><small>as SIFT matures</small></li>
+        <li><b>Regulatory onboarding and due diligence</b><small>on SIFT</small></li>
+       </ul></div>
+       <div class="tc rd end"><ul>
+        <li><b>Wider reporting</b><small>beyond answering questions</small></li>
+       </ul></div>
+       <div class="tc rd end"><ul>
+        <li><b>Regulatory exception investigation</b><small>raised by the business</small></li>
+        <li><b>Reason through residual exceptions</b><small>and guide resolution</small></li>
+       </ul></div>
+       <div class="tc rd end"><ul>
+        <li><b>Settlement fail and break prediction</b><small>from exception history</small></li>
+       </ul></div>
+      </div>
+     </section>
+
+    </div>
+   </div>
+
+   <section class="strip" aria-label="North star and ownership">
+    <div>
+     <div class="ttl"><h2>North star</h2><span>Autonomy is earned with evidence, one pattern at a time</span></div>
+     <div class="path">
+      <div class="st"><b>Human-reviewed</b><span>Every output checked; every correction kept as an eval case</span><i class="m"><em>measure</em>Correction rate</i></div>
+      <div class="ar" aria-hidden="true">&#8594;</div>
+      <div class="st"><b>Baselined</b><span>Accuracy known per pattern from sustained review</span><i class="m"><em>measure</em>First-pass accuracy</i></div>
+      <div class="fan" aria-hidden="true"></div>
+      <div class="br">
+       <div class="b star"><b>Straight-through</b><span>Proven patterns bypass review; people see only exceptions</span><i class="m"><em>north-star measure</em>Earned STP rate</i></div>
+       <div class="b"><b>Agent-guided</b><span>Agents reason through what remains and guide resolution</span><i class="m"><em>measure</em>Exception resolution time</i></div>
+       <div class="b"><b>Predictive</b><span>Breaks and fails anticipated before they occur</span><i class="m"><em>measure</em>Exceptions avoided</i></div>
+      </div>
+     </div>
+     <p class="pm"><b>Across the portfolio:</b> share of live AI workflows under Markets-owned control, and the effort to bring the next use case onto a shared foundation.</p>
+    </div>
+    <div>
+     <div class="ttl"><h2>Who owns what</h2></div>
+     <dl class="owners">
+      <div class="o-h"><dt>Capability hives</dt><dd>Use-case outcomes, domain schemas and validation rules, human review, and the call to widen autonomy</dd></div>
+      <div class="o-e"><dt>Horizontal engineering</dt><dd>SIFT, agent orchestration, eval harnesses, data products and shared patterns</dd></div>
+      <div class="o-a"><dt>Program Design Authority</dt><dd>Intake, risk tiering and design decisions</dd></div>
+      <div class="o-c"><dt>Central AI Factory</dt><dd>LLM endpoints, gateway and enterprise guardrails</dd></div>
+     </dl>
+    </div>
+   </section>
+
+   <footer class="ft">
+    <span>Sources: McKinsey, “Overcoming two issues that are sinking gen AI programs”; DORA, State of AI-assisted Software Development (2025); MAS, Guidelines on Artificial Intelligence Risk Management; EU, UK and Swiss T+1 transition; Citi, Securities Services Evolution.</span>
+    <span>Draft for discussion</span>
+   </footer>
+
+  </div>
+ </div>
+</div>
+<script>
+(function(){
+  var slide = document.querySelector('.slide');
+  var frame = document.querySelector('.frame');
+  function fit(){
+    if (window.innerWidth < 900){
+      document.body.classList.add('flow');
+      slide.style.transform = '';
+      frame.style.width = ''; frame.style.height = '';
+      return;
+    }
+    document.body.classList.remove('flow');
+    var W = document.body.clientWidth, H = document.body.clientHeight;
+    var s = Math.min((W - 32) / 1600, (H - 32) / 900);
+    slide.style.transform = 'scale(' + s + ')';
+    frame.style.width = (1600 * s) + 'px';
+    frame.style.height = (900 * s) + 'px';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
+</script>
+</body>
+</html>
